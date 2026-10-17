@@ -98,6 +98,10 @@
       <plugin>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
+        <configuration>
+          <!-- `spring-boot:test-run` starts DevServer: the app on embedded PostgreSQL. -->
+          <testMainClass>com.dolbaia.ledger.DevServer</testMainClass>
+        </configuration>
       </plugin>
       <!-- *IT classes boot the full app against embedded PostgreSQL; `mvn verify` runs them. -->
       <plugin>

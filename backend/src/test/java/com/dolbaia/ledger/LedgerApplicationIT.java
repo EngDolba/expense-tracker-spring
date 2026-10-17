@@ -56,4 +56,12 @@ class LedgerApplicationIT extends DatabaseTest {
         assertThat(jdbc.queryForObject("select count(*) from login_attempt where not succeeded", Integer.class))
                 .isEqualTo(5);
     }
+
+    @Test
+    void theCsrfTokenSurvivesAuthenticatedRequests() throws Exception {
+        var write = mvc.perform(post("/api/categories").with(owner())
+                .contentType(MediaType.APPLICATION_JSON).content("{\"name\":\"Food\"}")).andReturn().getResponse();
+        assertThat(write.getStatus()).isEqualTo(201);
+        assertThat(write.getCookie("XSRF-TOKEN")).isNull();
+    }
 }

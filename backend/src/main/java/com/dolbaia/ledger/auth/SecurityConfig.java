@@ -13,6 +13,7 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.session.NullAuthenticatedSessionStrategy;
 import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter.ReferrerPolicy;
 
 /**
@@ -27,6 +28,8 @@ public class SecurityConfig {
     static final String CONTENT_SECURITY_POLICY = String.join("; ",
             "default-src 'self'",
             "img-src 'self' data:",
+            // Vite inlines small font subsets as data: URIs.
+            "font-src 'self' data:",
             "style-src 'self' 'unsafe-inline'",
             "object-src 'none'",
             "base-uri 'self'",
@@ -36,7 +39,9 @@ public class SecurityConfig {
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http, SessionTokenService tokens) throws Exception {
         http
-                .csrf(csrf -> csrf.spa())
+                // Every request re-authenticates from the cookie, which session management
+                // would treat as a fresh login and rotate the CSRF token each time.
+                .csrf(csrf -> csrf.spa().sessionAuthenticationStrategy(new NullAuthenticatedSessionStrategy()))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
