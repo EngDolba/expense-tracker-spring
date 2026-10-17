@@ -1,0 +1,36 @@
+spring:
+  application:
+    name: ledger
+  # The datasource comes from DATABASE_URL (postgresql://user:pass@host/db, the
+  # Neon/Railway/RDS form) via DatabaseUrlEnvironmentPostProcessor, or from
+  # SPRING_DATASOURCE_URL/USERNAME/PASSWORD directly.
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+  flyway:
+    enabled: true
+  servlet:
+    multipart:
+      # The workbook importer accepts at most 10 MB.
+      max-file-size: 10MB
+      max-request-size: 11MB
+
+server:
+  # Trust X-Forwarded-* from the reverse proxy in front of the container, so
+  # login rate limiting sees the client's IP.
+  forward-headers-strategy: native
+
+app:
+  auth:
+    username: ${APP_USERNAME:}
+    password-hash: ${APP_PASSWORD_HASH:}
+    password-hash-base64: ${APP_PASSWORD_HASH_BASE64:}
+    session-secret: ${SESSION_SECRET:}
+    session-secret-base64: ${SESSION_SECRET_BASE64:}
+    session-duration: 14d
+    secure-cookie: ${APP_SECURE_COOKIE:true}
