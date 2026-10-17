@@ -10,7 +10,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 /**
  * Local development without installing PostgreSQL: starts an embedded one and
  * the app against it on :8080. Run with `./mvnw spring-boot:test-run`, then
- * `pnpm dev` in ../frontend. Sign in as dev / dev. Data is lost on exit.
+ * `pnpm dev` in ../frontend. Sign in as dev / dev unless APP_USERNAME is set.
+ * Data is lost on exit.
  */
 public final class DevServer {
 
@@ -29,9 +30,14 @@ public final class DevServer {
         System.setProperty("spring.datasource.url", postgres.getJdbcUrl("postgres", "postgres"));
         System.setProperty("spring.datasource.username", "postgres");
         System.setProperty("spring.datasource.password", "");
-        setDefault("app.auth.username", "dev");
-        setDefault("app.auth.password-hash", new BCryptPasswordEncoder().encode("dev"));
-        setDefault("app.auth.session-secret", "development-only-session-secret-0123456789");
+        // APP_USERNAME / APP_PASSWORD_HASH / SESSION_SECRET from the environment win (the e2e tests set them).
+        if (System.getenv("APP_USERNAME") == null) {
+            setDefault("app.auth.username", "dev");
+            setDefault("app.auth.password-hash", new BCryptPasswordEncoder().encode("dev"));
+        }
+        if (System.getenv("SESSION_SECRET") == null) {
+            setDefault("app.auth.session-secret", "development-only-session-secret-0123456789");
+        }
         setDefault("app.auth.secure-cookie", "false");
         SpringApplication.run(LedgerApplication.class, args);
     }

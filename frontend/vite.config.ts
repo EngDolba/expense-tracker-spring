@@ -20,6 +20,9 @@ export default defineConfig({
     // `pnpm dev` talks to the Spring Boot backend on :8080.
     proxy: { "/api": "http://localhost:8080" },
   },
+  preview: {
+    proxy: { "/api": "http://localhost:8080" },
+  },
   build: {
     outDir: "dist",
     sourcemap: false,
@@ -27,5 +30,6 @@ export default defineConfig({
   test: {
     environment: "node",
     include: ["src/**/*.test.{ts,tsx}"],
+    exclude: ["e2e/**", "node_modules/**"],
   },
 });

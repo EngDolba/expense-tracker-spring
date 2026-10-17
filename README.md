@@ -49,6 +49,10 @@ cd backend && ./mvnw verify
 cd frontend && pnpm lint && pnpm typecheck && pnpm test
 ```
 
+```bash
+cd frontend && pnpm test:e2e
+```
+
 - Backend unit tests cover the logic ported from `src/lib/*.test.ts`: money,
   categories, rules, every fitness rule, the workbook parser, auth.
 - `*IT` tests boot the whole app on embedded PostgreSQL 17 (no Docker). They
@@ -56,6 +60,12 @@ cd frontend && pnpm lint && pnpm typecheck && pnpm test
   lifecycle and the Prisma migration.
 - Frontend: the original Vitest suites (fitness rules, categories, money,
   number field, workout runner) run unchanged.
+- End to end: the original Playwright specs (login, ledgers, XLDR import, every
+  fitness flow) on desktop Chrome and Pixel 7. They start the backend on
+  embedded PostgreSQL and the production build themselves. The visual
+  snapshot spec was not ported; its baselines were rendered by Next.js. On
+  Windows, stopping `mvnw.cmd` can leave its forked JVM running, and the next
+  run reuses it with its data. Stop stray `java` processes first.
 
 ## Configuration
 

@@ -17,18 +17,31 @@ async function refresh() {
   await queryClient.invalidateQueries();
 }
 
-/** Runs a form action: reports a failure instead of throwing, then refetches. */
-function formAction(run: (form: Record<string, string | null>, formData: FormData) => Promise<unknown>) {
+/**
+ * Runs a form action: reports a failure instead of throwing, refetches, and
+ * then follows the path the action returned. The form action is a React
+ * transition that keeps the current page on screen until it ends, so the
+ * navigation happens after it.
+ */
+function formAction(
+  run: (form: Record<string, string | null>, formData: FormData) => Promise<unknown>,
+) {
   return async (formData: FormData) => {
+    let next: unknown;
     try {
-      await run(formJson(formData), formData);
+      next = await run(formJson(formData), formData);
     } catch (error) {
       notifyError(errorMessage(error));
-    } finally {
-      await refresh();
     }
+    await refresh();
+    // Navigate once the action's transition has ended, so the URL and the
+    // new page change together instead of the old page lingering under it.
+    if (typeof next === "string") setTimeout(() => navigate(next), 0);
   };
 }
+
+/** For actions that end on another page: the path formAction navigates to. */
+const goTo = (path: string) => path;
 
 const id = (form: Record<string, string | null>, key = "id") => form[key] ?? "";
 
@@ -134,7 +147,7 @@ export async function uploadWorkbookAction(formData: FormData) {
 
 export const commitImportAction = formAction(async (form) => {
   await api(`/api/imports/${id(form, "batchId")}/commit`, { method: "POST" });
-  navigate(`/imports/${id(form, "batchId")}?committed=1`);
+  return goTo(`/imports/${id(form, "batchId")}?committed=1`);
 });
 
 // ---- Fitness library and plans ---------------------------------------------------------------
@@ -186,12 +199,12 @@ export const removePlanExerciseAction = formAction((form) =>
 /** Opens the session's workout, resuming one already in progress. */
 export const startWorkoutAction = formAction(async (form) => {
   const started = await api<{ id: string }>("/api/fitness/workouts", { json: { planDayId: form.planDayId } });
-  navigate(`/fitness/workouts/${started.id}`);
+  return goTo(`/fitness/workouts/${started.id}`);
 });
 
 export const discardActiveWorkoutAction = formAction(async (form) => {
   await api(`/api/fitness/workouts/${id(form)}`, { method: "DELETE" });
-  navigate("/fitness");
+  return goTo("/fitness");
 });
 
 export async function saveActiveSetAction(payload: {

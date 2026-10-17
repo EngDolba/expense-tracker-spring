@@ -35,7 +35,9 @@ export const router = createBrowserRouter([
   },
 ]);
 
-setNavigator((to, options) => void router.navigate(to, options));
+// Actions navigate after their work is done; flushSync commits the new page in
+// the same step as the URL change, so the old page never shows under the new URL.
+setNavigator((to, options) => void router.navigate(to, { flushSync: true, ...options }));
 
 // An expired session sends the user to sign in, then back to where they were.
 setUnauthenticatedHandler(() => {

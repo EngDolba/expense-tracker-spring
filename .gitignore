@@ -7,3 +7,5 @@ frontend/dist/
 .vscode/
 frontend/.vite/
 backend/src/main/resources/static/
+frontend/test-results/
+frontend/playwright-report/
