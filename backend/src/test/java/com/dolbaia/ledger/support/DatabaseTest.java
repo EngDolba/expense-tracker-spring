@@ -81,6 +81,10 @@ public abstract class DatabaseTest {
         };
     }
 
+    protected Api api() {
+        return new Api(mvc, owner());
+    }
+
     @BeforeEach
     void emptyTables() {
         List<String> tables = jdbc.queryForList(

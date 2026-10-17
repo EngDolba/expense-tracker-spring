@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import com.dolbaia.ledger.imports.WorkbookParser;
+
 /**
  * Every error leaves the API as an RFC 7807 problem with a {@code code}
  * property the frontend translates.
@@ -30,6 +32,11 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(ApiException.class)
     ProblemDetail handleApi(ApiException exception) {
         return problem(exception.getStatus(), exception.getCode(), exception.getMessage());
+    }
+
+    @ExceptionHandler(WorkbookParser.InvalidWorkbookException.class)
+    ProblemDetail handleWorkbook(WorkbookParser.InvalidWorkbookException exception) {
+        return problem(HttpStatus.BAD_REQUEST, "invalid_workbook", exception.getMessage());
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)

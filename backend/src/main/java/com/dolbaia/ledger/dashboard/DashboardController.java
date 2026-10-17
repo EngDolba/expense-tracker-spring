@@ -1,0 +1,19 @@
+package com.dolbaia.ledger.dashboard;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class DashboardController {
+
+    private final DashboardService service;
+
+    public DashboardController(DashboardService service) {
+        this.service = service;
+    }
+
+    @GetMapping("/api/dashboard")
+    DashboardService.Dashboard dashboard() {
+        return service.dashboard();
+    }
+}
