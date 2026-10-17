@@ -6,3 +6,4 @@ frontend/dist/
 *.iml
 .vscode/
 frontend/.vite/
+backend/src/main/resources/static/
