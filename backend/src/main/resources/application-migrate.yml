@@ -1,0 +1,8 @@
+# One-off migration from the Next.js app's database: no web server, exit when done.
+spring:
+  main:
+    web-application-type: none
+app:
+  auth:
+    # The migration never signs anyone in, but the session service still starts.
+    session-secret: ${SESSION_SECRET:migration-only-secret-not-used-for-sessions}

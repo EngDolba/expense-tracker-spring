@@ -63,6 +63,17 @@ public abstract class DatabaseTest {
         registry.add("app.auth.session-secret", () -> "a-test-secret-that-is-longer-than-32-characters");
     }
 
+    /** Another database on the same embedded server, created empty. */
+    protected static javax.sql.DataSource freshDatabase(String name) {
+        try (var connection = POSTGRES.getPostgresDatabase().getConnection(); var statement = connection.createStatement()) {
+            statement.execute("drop database if exists " + name);
+            statement.execute("create database " + name);
+        } catch (java.sql.SQLException exception) {
+            throw new IllegalStateException(exception);
+        }
+        return POSTGRES.getDatabase("postgres", name);
+    }
+
     @Autowired protected MockMvc mvc;
     @Autowired protected JdbcTemplate jdbc;
     @Autowired private SessionTokenService tokens;
