@@ -362,7 +362,9 @@ CREATE TABLE active_workout_set (
     completed                  BOOLEAN       NOT NULL DEFAULT FALSE,
     created_at                 TIMESTAMPTZ   NOT NULL DEFAULT now(),
     updated_at                 TIMESTAMPTZ   NOT NULL DEFAULT now(),
-    CONSTRAINT active_workout_set_exercise_number_key UNIQUE (active_workout_exercise_id, set_number)
+    -- Deferred: switching variation replaces the sets, and Hibernate inserts before it deletes.
+    CONSTRAINT active_workout_set_exercise_number_key
+        UNIQUE (active_workout_exercise_id, set_number) DEFERRABLE INITIALLY DEFERRED
 );
 
 -- Authentication ----------------------------------------------------------------
